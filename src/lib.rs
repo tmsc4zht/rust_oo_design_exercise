@@ -20,6 +20,23 @@ impl Post {
   }
 }
 
+trait State {
+  // 所有権を奪い新しいStateを返す
+  fn request_review(self: Box<Self>) -> Box<State>;
+}
+
 struct Draft {}
 
-impl State for Draft {}
+impl State for Draft {
+  fn request_review(self: Box<Self>) -> Box<State> {
+    Box::new(PendingReview {})
+  }
+}
+
+struct PendingReview {}
+
+impl State for PendingReview {
+  fn request_review(self: Box<Self>) -> Box<State> {
+    self
+  }
+}
