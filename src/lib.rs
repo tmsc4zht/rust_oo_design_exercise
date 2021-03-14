@@ -10,9 +10,15 @@ impl Post {
       content: String::new(),
     }
   }
-}
 
-trait State {}
+  pub fn add_text(&mut self, text: &str) {
+    self.content.push_str(text);
+  }
+
+  pub fn content(&self) -> &str {
+    ""
+  }
+}
 
 struct Draft {}
 
