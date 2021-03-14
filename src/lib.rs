@@ -23,6 +23,7 @@ impl Post {
 trait State {
   // 所有権を奪い新しいStateを返す
   fn request_review(self: Box<Self>) -> Box<State>;
+  fn approve(self: Box<Self>) -> Box<State>;
 }
 
 struct Draft {}
@@ -31,12 +32,32 @@ impl State for Draft {
   fn request_review(self: Box<Self>) -> Box<State> {
     Box::new(PendingReview {})
   }
+
+  fn approve(self: Box<Self>) -> Box<State> {
+    self
+  }
 }
 
 struct PendingReview {}
 
 impl State for PendingReview {
   fn request_review(self: Box<Self>) -> Box<State> {
+    self
+  }
+
+  fn approve(self: Box<Self>) -> Box<State> {
+    Box::new(Published {})
+  }
+}
+
+struct Published {}
+
+impl State for Published {
+  fn request_review(self: Box<Self>) -> Box<State> {
+    self
+  }
+
+  fn approve(self: Box<Self>) -> Box<State> {
     self
   }
 }
