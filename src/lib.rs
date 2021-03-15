@@ -1,66 +1,46 @@
+// DraftPost -(request_reveiw)-> PendingReview
+// PendingReview -(approve)-> Post
+
 pub struct Post {
-  state: Option<Box<State>>,
+  content: String,
+}
+
+pub struct DraftPost {
   content: String,
 }
 
 impl Post {
-  pub fn new() -> Post {
-    Post {
-      state: Some(Box::new(Draft {})),
+  pub fn new() -> DraftPost {
+    DraftPost {
       content: String::new(),
     }
   }
 
+  pub fn content(&self) -> &str {
+    &self.content
+  }
+}
+
+impl DraftPost {
   pub fn add_text(&mut self, text: &str) {
     self.content.push_str(text);
   }
 
-  pub fn content(&self) -> &str {
-    self.state.as_ref().unwrap().content(&self)
+  pub fn request_review(self) -> PendingReviewPost {
+    PendingReviewPost {
+      content: self.content,
+    }
   }
 }
 
-trait State {
-  // 所有権を奪い新しいStateを返す
-  fn request_review(self: Box<Self>) -> Box<State>;
-  fn approve(self: Box<Self>) -> Box<State>;
-  fn content<'a>(&self, post: &'a Post) -> &'a str {
-    ""
-  }
+pub struct PendingReviewPost {
+  content: String,
 }
 
-struct Draft {}
-
-impl State for Draft {
-  fn request_review(self: Box<Self>) -> Box<State> {
-    Box::new(PendingReview {})
-  }
-
-  fn approve(self: Box<Self>) -> Box<State> {
-    self
-  }
-}
-
-struct PendingReview {}
-
-impl State for PendingReview {
-  fn request_review(self: Box<Self>) -> Box<State> {
-    self
-  }
-
-  fn approve(self: Box<Self>) -> Box<State> {
-    Box::new(Published {})
-  }
-}
-
-struct Published {}
-
-impl State for Published {
-  fn request_review(self: Box<Self>) -> Box<State> {
-    self
-  }
-
-  fn approve(self: Box<Self>) -> Box<State> {
-    self
+impl PendingReviewPost {
+  pub fn approve(self) -> Post {
+    Post {
+      content: self.content,
+    }
   }
 }
