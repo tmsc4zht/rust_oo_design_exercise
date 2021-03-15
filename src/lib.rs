@@ -16,7 +16,7 @@ impl Post {
   }
 
   pub fn content(&self) -> &str {
-    ""
+    self.state.as_ref().unwrap().content(&self)
   }
 }
 
@@ -24,6 +24,9 @@ trait State {
   // 所有権を奪い新しいStateを返す
   fn request_review(self: Box<Self>) -> Box<State>;
   fn approve(self: Box<Self>) -> Box<State>;
+  fn content<'a>(&self, post: &'a Post) -> &'a str {
+    ""
+  }
 }
 
 struct Draft {}
